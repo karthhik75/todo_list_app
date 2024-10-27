@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS file, if you have one -->
+</head>
+<body>
+    <div class="container">
+        <h1>To-Do List</h1>
+        <div>
+            <h2>Your Tasks:</h2>
+            <ul id="task-list"></ul>
+        </div>
+        <input type="text" id="new-task" placeholder="Enter a new task" required>
+        <button id="add-task-btn">Add Task</button>
+        <button id="remove-task-btn">Remove Selected Task</button>
+    </div>
+
+    <script>
+        const taskList = document.getElementById('task-list');
+        const newTaskInput = document.getElementById('new-task');
+        const addTaskBtn = document.getElementById('add-task-btn');
+        const removeTaskBtn = document.getElementById('remove-task-btn');
+
+        // Load tasks from localStorage
+        const loadTasks = () => {
+            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            taskList.innerHTML = ''; // Clear the existing list
+            tasks.forEach((task, index) => {
+                const li = document.createElement('li');
+                li.textContent = task;
+                li.dataset.index = index; // Store the index for removal
+                taskList.appendChild(li);
+            });
+        };
+
+        // Save tasks to localStorage
+        const saveTasks = (tasks) => {
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        };
+
+        // Add task
+        addTaskBtn.addEventListener('click', () => {
+            const task = newTaskInput.value.trim();
+            if (task) {
+                const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+                tasks.push(task);
+                saveTasks(tasks);
+                loadTasks(); // Refresh the task list
+                newTaskInput.value = ''; // Clear input
+            }
+        });
+
+        // Remove selected task
+        removeTaskBtn.addEventListener('click', () => {
+            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            const selectedTaskIndex = Array.from(taskList.children).findIndex(task => task.classList.contains('selected'));
+            if (selectedTaskIndex !== -1) {
+                tasks.splice(selectedTaskIndex, 1);
+                saveTasks(tasks);
+                loadTasks(); // Refresh the task list
+            }
+        });
+
+        // Click event to select a task
+        taskList.addEventListener('click', (e) => {
+            if (e.target.tagName === 'LI') {
+                e.target.classList.toggle('selected'); // Toggle selection
+            }
+        });
+
+        // Initial load of tasks
+        loadTasks();
+    </script>
+</body>
+</html>
